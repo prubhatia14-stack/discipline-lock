@@ -12,11 +12,18 @@ export interface Challenge {
   workoutLogs: WorkoutLog[];
 }
 
+export type WorkoutType = 'strength' | 'cardio' | 'mixed' | 'mobility' | 'other';
+export type WorkoutIntensity = 'easy' | 'medium' | 'hard';
+
 export interface WorkoutLog {
   date: Date;
   logged: boolean;
+  missed?: boolean;
   audited: boolean;
   auditPassed?: boolean;
+  workoutType?: WorkoutType;
+  intensity?: WorkoutIntensity;
+  notes?: string;
 }
 
 export interface OnboardingState {
@@ -25,4 +32,10 @@ export interface OnboardingState {
   durationDays: number;
   startDate: Date | null;
   rulesAccepted: boolean;
+}
+
+export interface UserProfile {
+  name: string;
+  timezone: string;
+  reminderTime: string;
 }

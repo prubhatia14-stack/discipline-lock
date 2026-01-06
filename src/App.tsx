@@ -7,6 +7,11 @@ import { ChallengeProvider } from "@/context/ChallengeContext";
 import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
+import Logs from "./pages/Logs";
+import Stakes from "./pages/Stakes";
+import Profile from "./pages/Profile";
+import Share from "./pages/Share";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +27,11 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/logs" element={<Logs />} />
+            <Route path="/stakes" element={<Stakes />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/share" element={<Share />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

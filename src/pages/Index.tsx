@@ -1,14 +1,22 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useChallenge } from "@/context/ChallengeContext";
 
-const Index = () => {
+export default function Index() {
+  const navigate = useNavigate();
+  const { challenge } = useChallenge();
+
+  useEffect(() => {
+    if (challenge && challenge.status === 'active') {
+      navigate("/dashboard");
+    } else {
+      navigate("/onboarding");
+    }
+  }, [challenge, navigate]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="dark min-h-screen bg-background text-foreground flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" />
     </div>
   );
-};
-
-export default Index;
+}

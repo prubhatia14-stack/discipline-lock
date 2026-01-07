@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { HoldButton } from "@/components/ui/HoldButton";
 import { format, addDays } from "date-fns";
 import { Lock } from "lucide-react";
 
@@ -63,17 +63,22 @@ export function PaymentScreen({
             <div className="flex items-center gap-3 text-sm">
               <Lock className="w-5 h-5 shrink-0" />
               <p className="text-muted-foreground">
-                Funds are non-refundable until challenge ends. Failed audits result in full stake forfeiture.
+                Funds are non-refundable until challenge ends. Stay consistent to get your money back.
               </p>
             </div>
           </div>
 
-          <Button 
-            onClick={onConfirm}
-            className="w-full h-14 text-lg font-bold uppercase border-2 shadow-md hover:shadow-xs hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+          <HoldButton 
+            onHoldComplete={onConfirm}
+            holdDuration={4000}
+            className="w-full h-14 text-lg font-bold uppercase border-2 shadow-md transition-all"
           >
-            Lock My Money
-          </Button>
+            Hold to Lock Money
+          </HoldButton>
+          
+          <p className="text-center text-xs text-muted-foreground">
+            Hold for 4 seconds to confirm
+          </p>
         </div>
       </div>
     </div>

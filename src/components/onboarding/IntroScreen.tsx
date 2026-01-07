@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { HoldButton } from "@/components/ui/HoldButton";
 
 interface IntroScreenProps {
   onContinue: () => void;
@@ -17,13 +17,17 @@ export function IntroScreen({ onContinue }: IntroScreenProps) {
           <p className="text-muted-foreground">Stay consistent. Get it back.</p>
         </div>
 
-        <div className="pt-8">
-          <Button 
-            onClick={onContinue}
-            className="w-full h-14 text-lg font-bold uppercase border-2 shadow-md hover:shadow-xs hover:translate-x-[3px] hover:translate-y-[3px] transition-all"
+        <div className="pt-8 space-y-3">
+          <HoldButton 
+            onHoldComplete={onContinue}
+            holdDuration={3000}
+            className="w-full h-14 text-lg font-bold uppercase border-2 shadow-md transition-all"
           >
-            Start
-          </Button>
+            Hold to Start
+          </HoldButton>
+          <p className="text-xs text-muted-foreground">
+            Hold for 3 seconds to begin
+          </p>
         </div>
       </div>
     </div>

@@ -72,8 +72,8 @@ export function QuickLogSheet({ open, onComplete, onCancel }: QuickLogSheetProps
                   onClick={() => setType(wt.value)}
                   className={`flex flex-col items-center justify-center p-3 border-2 transition-all ${
                     type === wt.value
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border hover:border-muted-foreground"
+                      ? "bg-foreground text-background border-foreground"
+                      : "bg-background text-foreground border-border hover:border-foreground"
                   }`}
                 >
                   {wt.icon}
@@ -93,8 +93,8 @@ export function QuickLogSheet({ open, onComplete, onCancel }: QuickLogSheetProps
                   onClick={() => setIntensity(int.value)}
                   className={`py-3 px-4 border-2 font-medium transition-all ${
                     intensity === int.value
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border hover:border-muted-foreground"
+                      ? "bg-foreground text-background border-foreground"
+                      : "bg-background text-foreground border-border hover:border-foreground"
                   }`}
                 >
                   {int.label}

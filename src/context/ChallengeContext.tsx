@@ -52,7 +52,7 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
   const resetOnboarding = () => setOnboarding(initialOnboarding);
 
   const logWorkout = () => {
-    const auditTriggered = Math.random() < 0.2;
+    const auditTriggered = Math.random() < 0.5; // 50% audit probability
     const auditCode = Math.floor(Math.random() * 90) + 10;
     
     return { audited: auditTriggered, auditCode };

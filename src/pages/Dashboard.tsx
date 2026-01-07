@@ -29,8 +29,27 @@ export default function Dashboard() {
   }
 
   const today = new Date();
-  const daysRemaining = Math.max(0, differenceInDays(challenge.endDate, today));
-  const daysElapsed = differenceInDays(today, challenge.startDate);
+  today.setHours(0, 0, 0, 0);
+  
+  const startDate = new Date(challenge.startDate);
+  startDate.setHours(0, 0, 0, 0);
+  
+  const challengeStarted = today >= startDate;
+  const startsInDays = challengeStarted ? 0 : differenceInDays(startDate, today);
+  
+  // Days remaining is always based on durationDays, not endDate calculation
+  let daysRemaining: number;
+  let daysElapsed: number;
+  
+  if (!challengeStarted) {
+    // Before challenge starts
+    daysRemaining = challenge.durationDays;
+    daysElapsed = 0;
+  } else {
+    // Challenge has started - calculate from start date
+    daysElapsed = differenceInDays(today, startDate) + 1; // +1 because day 1 is start date
+    daysRemaining = Math.max(0, challenge.durationDays - daysElapsed + 1);
+  }
   const progress = Math.min(100, (challenge.workoutsCompleted / challenge.durationDays) * 100);
   
   const todayLog = challenge.workoutLogs.find(
@@ -231,13 +250,26 @@ export default function Dashboard() {
       <div className="min-h-[calc(100vh-56px)] flex flex-col p-6">
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
-          <div>
+          <div className="flex-1 min-w-0">
             <p className="text-sm text-muted-foreground uppercase">Remaining</p>
             <p className="text-4xl font-bold">₹{challenge.remainingStake.toLocaleString()}</p>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-muted-foreground uppercase">Days Left</p>
-            <p className="text-4xl font-bold">{daysRemaining}</p>
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground uppercase">
+                {startsInDays > 0 ? "Starts In" : "Days Left"}
+              </p>
+              <p className="text-4xl font-bold min-w-[48px]">
+                {startsInDays > 0 ? startsInDays : daysRemaining}
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/share')}
+              className="p-2 border-2 border-border hover:bg-muted transition-colors shrink-0"
+              aria-label="Share"
+            >
+              <Share2 className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
@@ -252,13 +284,6 @@ export default function Dashboard() {
                 </p>
               </div>
             </ProgressRing>
-            {/* Share button on ring */}
-            <button
-              onClick={() => navigate('/share')}
-              className="absolute top-0 right-0 p-2 border-2 border-border hover:bg-muted transition-colors"
-            >
-              <Share2 className="w-4 h-4" />
-            </button>
           </div>
         </div>
 

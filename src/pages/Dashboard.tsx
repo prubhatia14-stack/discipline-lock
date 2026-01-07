@@ -6,6 +6,9 @@ import { ProgressRing } from "@/components/ProgressRing";
 import { AuditFlow } from "@/components/AuditFlow";
 import { QuickLogSheet } from "@/components/QuickLogSheet";
 import { MissedWorkoutDialog } from "@/components/MissedWorkoutDialog";
+import { PyramidAnimation } from "@/components/PyramidAnimation";
+import { ConfettiCelebration } from "@/components/ConfettiCelebration";
+import { HoldButton } from "@/components/ui/HoldButton";
 import { Button } from "@/components/ui/button";
 import { differenceInDays, format, isToday } from "date-fns";
 import { toast } from "sonner";
@@ -22,6 +25,8 @@ export default function Dashboard() {
   const [showQuickLog, setShowQuickLog] = useState(false);
   const [showMissedDialog, setShowMissedDialog] = useState(false);
   const [pendingAudit, setPendingAudit] = useState(false);
+  const [showPyramid, setShowPyramid] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   if (!challenge) {
     navigate("/");
@@ -37,17 +42,14 @@ export default function Dashboard() {
   const challengeStarted = today >= startDate;
   const startsInDays = challengeStarted ? 0 : differenceInDays(startDate, today);
   
-  // Days remaining is always based on durationDays, not endDate calculation
   let daysRemaining: number;
   let daysElapsed: number;
   
   if (!challengeStarted) {
-    // Before challenge starts
     daysRemaining = challenge.durationDays;
     daysElapsed = 0;
   } else {
-    // Challenge has started - calculate from start date
-    daysElapsed = differenceInDays(today, startDate) + 1; // +1 because day 1 is start date
+    daysElapsed = differenceInDays(today, startDate) + 1;
     daysRemaining = Math.max(0, challenge.durationDays - daysElapsed + 1);
   }
   const progress = Math.min(100, (challenge.workoutsCompleted / challenge.durationDays) * 100);
@@ -72,7 +74,6 @@ export default function Dashboard() {
       setShowAudit(true);
       setPendingAudit(true);
     } else {
-      // No audit - go straight to quick log
       setShowQuickLog(true);
     }
   };
@@ -82,10 +83,8 @@ export default function Dashboard() {
     setPendingAudit(false);
     
     if (passed) {
-      // Audit passed - now show quick log
       setShowQuickLog(true);
     } else {
-      // Audit failed - challenge over
       setChallenge({
         ...challenge,
         remainingStake: 0,
@@ -113,6 +112,9 @@ export default function Dashboard() {
   const handleQuickLogComplete = (data: { type: WorkoutType; intensity: WorkoutIntensity; notes?: string }) => {
     setShowQuickLog(false);
     
+    // Show pyramid animation
+    setShowPyramid(true);
+    
     setChallenge({
       ...challenge,
       workoutsCompleted: challenge.workoutsCompleted + 1,
@@ -130,12 +132,19 @@ export default function Dashboard() {
         },
       ],
     });
+  };
+
+  const handlePyramidComplete = () => {
+    setShowPyramid(false);
+    setShowConfetti(true);
     toast.success("Workout logged!");
+    
+    // Reset confetti after animation
+    setTimeout(() => setShowConfetti(false), 3000);
   };
 
   const handleQuickLogCancel = () => {
     setShowQuickLog(false);
-    // If they cancel quick log, treat as if nothing happened (they can try again)
   };
 
   const handleMissedWorkout = () => {
@@ -247,6 +256,13 @@ export default function Dashboard() {
         onCancel={() => setShowMissedDialog(false)}
       />
 
+      <PyramidAnimation 
+        isVisible={showPyramid} 
+        onComplete={handlePyramidComplete}
+      />
+      
+      <ConfettiCelebration trigger={showConfetti} />
+
       <div className="min-h-[calc(100vh-56px)] flex flex-col p-6">
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
@@ -310,13 +326,22 @@ export default function Dashboard() {
 
         {/* Action Buttons */}
         <div className="space-y-3">
-          <Button 
-            onClick={handleLogWorkout}
-            disabled={todayProcessed}
-            className="w-full h-16 text-xl font-bold uppercase border-2 shadow-md hover:shadow-xs hover:translate-x-[3px] hover:translate-y-[3px] transition-all disabled:opacity-50"
-          >
-            {todayLogged ? "Logged Today ✓" : todayMissed ? "Missed Today" : "Log Workout Today"}
-          </Button>
+          {todayProcessed ? (
+            <Button 
+              disabled
+              className="w-full h-16 text-xl font-bold uppercase border-2 shadow-md transition-all disabled:opacity-50"
+            >
+              {todayLogged ? "Logged Today ✓" : "Missed Today"}
+            </Button>
+          ) : (
+            <HoldButton 
+              onHoldComplete={handleLogWorkout}
+              holdDuration={3000}
+              className="w-full h-16 text-xl font-bold uppercase border-2 shadow-md transition-all"
+            >
+              Hold to Log Workout
+            </HoldButton>
+          )}
 
           {!todayProcessed && (
             <Button

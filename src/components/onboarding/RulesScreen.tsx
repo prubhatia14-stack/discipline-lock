@@ -12,9 +12,8 @@ interface RulesScreenProps {
 const RULES = [
   "Log 1 workout per day",
   "Minimum workout time: 45 minutes",
-  "20% random audits",
   "Missed day penalty: ₹100",
-  "Audit failure = challenge failed",
+  "Complete all days to get your money back",
 ];
 
 export function RulesScreen({ stakeAmount, onContinue, onBack }: RulesScreenProps) {

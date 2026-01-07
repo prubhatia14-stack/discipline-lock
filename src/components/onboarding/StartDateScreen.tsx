@@ -12,7 +12,8 @@ export function StartDateScreen({ onContinue, onBack }: StartDateScreenProps) {
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState<Date>(today);
 
-  const dateOptions = Array.from({ length: 8 }, (_, i) => addDays(today, i));
+  // Limit to next 3 days only (today + 2 more)
+  const dateOptions = Array.from({ length: 3 }, (_, i) => addDays(today, i));
 
   return (
     <div className="flex flex-col min-h-screen p-8">
@@ -30,7 +31,7 @@ export function StartDateScreen({ onContinue, onBack }: StartDateScreenProps) {
             <p className="text-muted-foreground">Choose when your challenge begins.</p>
           </div>
 
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             {dateOptions.map((date, index) => (
               <button
                 key={index}

@@ -3,6 +3,7 @@ import { useState, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "./button";
 import { type VariantProps } from "class-variance-authority";
+import { triggerHaptic } from "@/hooks/useHapticFeedback";
 
 interface HoldButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -26,19 +27,33 @@ export function HoldButton({
   const [isHolding, setIsHolding] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number>(0);
+  const lastMilestoneRef = useRef<number>(0);
 
   const startHold = useCallback(() => {
     if (disabled) return;
     setIsHolding(true);
     startTimeRef.current = Date.now();
+    lastMilestoneRef.current = 0;
+    
+    // Initial haptic on start
+    triggerHaptic('light');
     
     intervalRef.current = setInterval(() => {
       const elapsed = Date.now() - startTimeRef.current;
       const newProgress = Math.min((elapsed / holdDuration) * 100, 100);
       setProgress(newProgress);
       
+      // Subtle haptic feedback at milestones (25%, 50%, 75%)
+      const milestone = Math.floor(newProgress / 25);
+      if (milestone > lastMilestoneRef.current && milestone < 4) {
+        triggerHaptic('light');
+        lastMilestoneRef.current = milestone;
+      }
+      
       if (newProgress >= 100) {
         clearInterval(intervalRef.current!);
+        // Strong success haptic on completion
+        triggerHaptic('success');
         onHoldComplete();
         setProgress(0);
         setIsHolding(false);

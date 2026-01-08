@@ -159,3 +159,66 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* iOS text selection prevention for UI elements */
+@layer utilities {
+  .select-none {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Splash screen animations */
+@keyframes splash-lock-body {
+  0% { stroke-dashoffset: 144; }
+  40%, 100% { stroke-dashoffset: 0; }
+}
+
+@keyframes splash-lock-shackle {
+  0%, 20% { stroke-dashoffset: 60; }
+  60%, 100% { stroke-dashoffset: 0; }
+}
+
+@keyframes splash-keyhole {
+  0%, 50% { opacity: 0; transform: scale(0); }
+  70%, 100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes splash-text {
+  0%, 60% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-splash-lock-body {
+  animation: splash-lock-body 1.2s ease-out forwards;
+}
+
+.animate-splash-lock-shackle {
+  animation: splash-lock-shackle 1.2s ease-out forwards;
+}
+
+.animate-splash-keyhole {
+  animation: splash-keyhole 1.2s ease-out forwards;
+}
+
+.animate-splash-text {
+  animation: splash-text 1.2s ease-out forwards;
+}
+
+/* Page transitions */
+@keyframes page-enter {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-page-enter {
+  animation: page-enter 0.2s ease-out;
+}
+
+/* Button tap feedback */
+button:not(:disabled):active,
+[role="button"]:not(:disabled):active {
+  transition: transform 0.1s ease-out;
+}

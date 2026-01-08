@@ -337,7 +337,7 @@ export default function Dashboard() {
             <HoldButton 
               onHoldComplete={handleLogWorkout}
               holdDuration={3000}
-              className="w-full h-16 text-xl font-bold uppercase border-2 shadow-md transition-all"
+              className="w-full h-16 text-xl font-bold uppercase border-2 shadow-md transition-all select-none"
             >
               Hold to Log Workout
             </HoldButton>

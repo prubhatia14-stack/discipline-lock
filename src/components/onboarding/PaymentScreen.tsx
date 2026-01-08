@@ -1,4 +1,4 @@
-import { HoldButton } from "@/components/ui/HoldButton";
+import { Button } from "@/components/ui/button";
 import { format, addDays } from "date-fns";
 import { Lock } from "lucide-react";
 
@@ -24,7 +24,7 @@ export function PaymentScreen({
     <div className="flex flex-col min-h-screen p-8">
       <button 
         onClick={onBack}
-        className="self-start text-muted-foreground hover:text-foreground transition-colors uppercase text-sm font-medium"
+        className="self-start text-muted-foreground hover:text-foreground transition-colors uppercase text-sm font-medium select-none active:scale-95"
       >
         ← Back
       </button>
@@ -32,7 +32,7 @@ export function PaymentScreen({
       <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto w-full">
         <div className="w-full space-y-8">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-bold uppercase">Confirm & Lock</h2>
+            <h2 className="text-3xl font-bold uppercase select-none">Confirm & Lock</h2>
             <p className="text-muted-foreground">Your money will be locked until challenge completion.</p>
           </div>
 
@@ -68,17 +68,12 @@ export function PaymentScreen({
             </div>
           </div>
 
-          <HoldButton 
-            onHoldComplete={onConfirm}
-            holdDuration={4000}
-            className="w-full h-14 text-lg font-bold uppercase border-2 shadow-md transition-all"
+          <Button 
+            onClick={onConfirm}
+            className="w-full h-14 text-lg font-bold uppercase border-2 shadow-md active:shadow-xs active:translate-x-[3px] active:translate-y-[3px] transition-all select-none"
           >
-            Hold to Lock Money
-          </HoldButton>
-          
-          <p className="text-center text-xs text-muted-foreground">
-            Hold for 4 seconds to confirm
-          </p>
+            Lock My Money
+          </Button>
         </div>
       </div>
     </div>

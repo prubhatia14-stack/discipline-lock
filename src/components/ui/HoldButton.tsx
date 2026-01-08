@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "./button";
 import { type VariantProps } from "class-variance-authority";
 import { triggerHaptic } from "@/hooks/useHapticFeedback";
+import { playSound, playSuccessChime } from "@/hooks/useSoundEffects";
 
 interface HoldButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -35,25 +36,28 @@ export function HoldButton({
     startTimeRef.current = Date.now();
     lastMilestoneRef.current = 0;
     
-    // Initial haptic on start
+    // Initial haptic and sound on start
     triggerHaptic('light');
+    playSound('tap');
     
     intervalRef.current = setInterval(() => {
       const elapsed = Date.now() - startTimeRef.current;
       const newProgress = Math.min((elapsed / holdDuration) * 100, 100);
       setProgress(newProgress);
       
-      // Subtle haptic feedback at milestones (25%, 50%, 75%)
+      // Subtle haptic and sound feedback at milestones (25%, 50%, 75%)
       const milestone = Math.floor(newProgress / 25);
       if (milestone > lastMilestoneRef.current && milestone < 4) {
         triggerHaptic('light');
+        playSound('hold-tick');
         lastMilestoneRef.current = milestone;
       }
       
       if (newProgress >= 100) {
         clearInterval(intervalRef.current!);
-        // Strong success haptic on completion
+        // Strong success haptic and chime on completion
         triggerHaptic('success');
+        playSuccessChime();
         onHoldComplete();
         setProgress(0);
         setIsHolding(false);

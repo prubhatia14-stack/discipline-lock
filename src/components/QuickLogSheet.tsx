@@ -70,10 +70,10 @@ export function QuickLogSheet({ open, onComplete, onCancel }: QuickLogSheetProps
                 <button
                   key={wt.value}
                   onClick={() => setType(wt.value)}
-                  className={`flex flex-col items-center justify-center p-3 border-2 transition-all ${
+                  className={`flex flex-col items-center justify-center p-3 border-2 transition-all select-none active:scale-95 ${
                     type === wt.value
-                      ? "bg-foreground text-background border-foreground"
-                      : "bg-background text-foreground border-border hover:border-foreground"
+                      ? "bg-foreground text-background border-foreground shadow-xs"
+                      : "bg-muted/50 text-foreground border-muted-foreground/50 hover:border-foreground hover:bg-muted"
                   }`}
                 >
                   {wt.icon}
@@ -91,10 +91,10 @@ export function QuickLogSheet({ open, onComplete, onCancel }: QuickLogSheetProps
                 <button
                   key={int.value}
                   onClick={() => setIntensity(int.value)}
-                  className={`py-3 px-4 border-2 font-medium transition-all ${
+                  className={`py-3 px-4 border-2 font-medium transition-all select-none active:scale-95 ${
                     intensity === int.value
-                      ? "bg-foreground text-background border-foreground"
-                      : "bg-background text-foreground border-border hover:border-foreground"
+                      ? "bg-foreground text-background border-foreground shadow-xs"
+                      : "bg-muted/50 text-foreground border-muted-foreground/50 hover:border-foreground hover:bg-muted"
                   }`}
                 >
                   {int.label}

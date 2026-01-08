@@ -54,11 +54,15 @@ export function HoldButton({
     setIsHolding(false);
   }, []);
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+  };
+
   return (
     <button
       className={cn(
         buttonVariants({ variant, size }),
-        "relative overflow-hidden",
+        "relative overflow-hidden select-none",
         className
       )}
       onMouseDown={startHold}
@@ -67,7 +71,13 @@ export function HoldButton({
       onTouchStart={startHold}
       onTouchEnd={endHold}
       onTouchCancel={endHold}
+      onContextMenu={handleContextMenu}
       disabled={disabled}
+      style={{
+        WebkitUserSelect: "none",
+        WebkitTouchCallout: "none",
+        userSelect: "none",
+      } as React.CSSProperties}
       {...props}
     >
       {/* Progress fill */}

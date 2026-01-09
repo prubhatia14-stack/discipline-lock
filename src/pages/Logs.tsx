@@ -39,7 +39,7 @@ export default function Logs() {
 
   const getStatusColor = (status: string | null) => {
     switch (status) {
-      case 'logged': return 'bg-green-600';
+      case 'logged': return 'bg-green-500';
       case 'missed': return 'bg-destructive';
       case 'audited': return 'bg-yellow-500';
       default: return 'bg-muted';
@@ -138,12 +138,12 @@ export default function Logs() {
             {/* Legend */}
             <div className="flex gap-4 mt-4 text-xs text-muted-foreground justify-center">
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-green-600 rounded-full" />
+                <div className="w-2 h-2 bg-green-500 rounded-full" />
                 <span>Logged</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-destructive rounded-full" />
-                <span>Missed</span>
+                <span>Missed (₹100)</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-yellow-500 rounded-full" />
@@ -219,12 +219,12 @@ export default function Logs() {
                       </div>
                       <div className="flex items-center gap-2">
                         {log.audited && (
-                          <span className={`text-xs px-2 py-1 ${log.auditPassed ? 'bg-green-600' : 'bg-destructive'}`}>
+                          <span className={`text-xs px-2 py-1 ${log.auditPassed ? 'bg-green-500' : 'bg-destructive'}`}>
                             {log.auditPassed ? 'Audit ✓' : 'Audit ✗'}
                           </span>
                         )}
                         <div className={`w-3 h-3 rounded-full ${
-                          log.missed ? 'bg-destructive' : log.audited ? 'bg-yellow-500' : 'bg-green-600'
+                          log.missed ? 'bg-destructive' : log.audited ? 'bg-yellow-500' : 'bg-green-500'
                         }`} />
                       </div>
                     </div>

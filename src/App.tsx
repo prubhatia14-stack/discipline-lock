@@ -12,6 +12,8 @@ import Stakes from "./pages/Stakes";
 import Profile from "./pages/Profile";
 import Share from "./pages/Share";
 import Settings from "./pages/Settings";
+import Wallet from "./pages/Wallet";
+import Challenges from "./pages/Challenges";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,8 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/share" element={<Share />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/wallet" element={<Wallet />} />
+            <Route path="/challenges" element={<Challenges />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -7,6 +7,8 @@ import {
   User,
   Share2,
   Settings,
+  Wallet,
+  History,
 } from "lucide-react";
 import {
   Sidebar,
@@ -22,6 +24,8 @@ import {
 const menuItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Logs", url: "/logs", icon: CalendarDays },
+  { title: "Wallet", url: "/wallet", icon: Wallet },
+  { title: "Challenges", url: "/challenges", icon: History },
   { title: "Stakes & Rules", url: "/stakes", icon: Scale },
   { title: "Profile", url: "/profile", icon: User },
   { title: "Share", url: "/share", icon: Share2 },

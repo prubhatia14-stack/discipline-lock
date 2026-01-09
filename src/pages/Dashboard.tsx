@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useChallenge } from "@/context/ChallengeContext";
+import { useTrustedTime } from "@/hooks/useTrustedTime";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProgressRing } from "@/components/ProgressRing";
 import { AuditFlow } from "@/components/AuditFlow";
@@ -8,6 +9,7 @@ import { QuickLogSheet } from "@/components/QuickLogSheet";
 import { MissedWorkoutDialog } from "@/components/MissedWorkoutDialog";
 import { PyramidAnimation } from "@/components/PyramidAnimation";
 import { ConfettiCelebration } from "@/components/ConfettiCelebration";
+import { CountdownPill, LoggedSuccessPill, MissedDayPill } from "@/components/CountdownPill";
 import { HoldButton } from "@/components/ui/HoldButton";
 import { Button } from "@/components/ui/button";
 import { differenceInDays, format, isToday } from "date-fns";
@@ -19,7 +21,8 @@ const PENALTY_AMOUNT = 100;
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { challenge, setChallenge, logWorkout, applyPenalty } = useChallenge();
+  const { challenge, setChallenge, logWorkout, applyPenalty, addTransaction, checkMissedDays } = useChallenge();
+  const { getTrustedDate, getDayKey } = useTrustedTime();
   const [showAudit, setShowAudit] = useState(false);
   const [auditCode, setAuditCode] = useState(0);
   const [showQuickLog, setShowQuickLog] = useState(false);
@@ -27,20 +30,33 @@ export default function Dashboard() {
   const [pendingAudit, setPendingAudit] = useState(false);
   const [showPyramid, setShowPyramid] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [justLogged, setJustLogged] = useState(false);
+  const [missedPenaltiesApplied, setMissedPenaltiesApplied] = useState(0);
+
+  // Check for missed days on component mount
+  useEffect(() => {
+    if (challenge && challenge.status === 'active') {
+      const missedCount = checkMissedDays();
+      if (missedCount > 0) {
+        setMissedPenaltiesApplied(missedCount);
+        toast.error(`Applied ${missedCount} missed day ${missedCount === 1 ? 'penalty' : 'penalties'}`);
+      }
+    }
+  }, []);
 
   if (!challenge) {
     navigate("/");
     return null;
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const trustedToday = getTrustedDate();
+  trustedToday.setHours(0, 0, 0, 0);
   
   const startDate = new Date(challenge.startDate);
   startDate.setHours(0, 0, 0, 0);
   
-  const challengeStarted = today >= startDate;
-  const startsInDays = challengeStarted ? 0 : differenceInDays(startDate, today);
+  const challengeStarted = trustedToday >= startDate;
+  const startsInDays = challengeStarted ? 0 : differenceInDays(startDate, trustedToday);
   
   let daysRemaining: number;
   let daysElapsed: number;
@@ -49,14 +65,17 @@ export default function Dashboard() {
     daysRemaining = challenge.durationDays;
     daysElapsed = 0;
   } else {
-    daysElapsed = differenceInDays(today, startDate) + 1;
+    daysElapsed = differenceInDays(trustedToday, startDate) + 1;
     daysRemaining = Math.max(0, challenge.durationDays - daysElapsed + 1);
   }
   const progress = Math.min(100, (challenge.workoutsCompleted / challenge.durationDays) * 100);
   
-  const todayLog = challenge.workoutLogs.find(
-    (log) => isToday(new Date(log.date))
-  );
+  const todayKey = getDayKey();
+  const todayLog = challenge.workoutLogs.find((log) => {
+    const logDate = new Date(log.date);
+    logDate.setHours(0, 0, 0, 0);
+    return logDate.getTime() === trustedToday.getTime();
+  });
   const todayLogged = todayLog?.logged === true;
   const todayMissed = todayLog?.missed === true;
   const todayProcessed = todayLogged || todayMissed;
@@ -91,9 +110,19 @@ export default function Dashboard() {
         status: 'failed',
         workoutLogs: [
           ...challenge.workoutLogs,
-          { date: new Date(), logged: false, audited: true, auditPassed: false },
+          { date: getTrustedDate(), logged: false, audited: true, auditPassed: false },
         ],
       });
+      
+      addTransaction({
+        challengeId: challenge.id,
+        type: 'forfeit',
+        reason: 'Audit failed - challenge terminated',
+        amount: -challenge.remainingStake,
+        currency: 'INR',
+        status: 'forfeited',
+      });
+      
       toast.error("Audit failed. Challenge terminated.");
     }
   };
@@ -106,6 +135,16 @@ export default function Dashboard() {
       remainingStake: 0,
       status: 'failed',
     });
+    
+    addTransaction({
+      challengeId: challenge.id,
+      type: 'forfeit',
+      reason: 'Audit skipped - challenge forfeited',
+      amount: -challenge.remainingStake,
+      currency: 'INR',
+      status: 'forfeited',
+    });
+    
     toast.error("Audit skipped. Challenge failed.");
   };
 
@@ -114,6 +153,7 @@ export default function Dashboard() {
     
     // Show pyramid animation
     setShowPyramid(true);
+    setJustLogged(true);
     
     setChallenge({
       ...challenge,
@@ -122,7 +162,7 @@ export default function Dashboard() {
       workoutLogs: [
         ...challenge.workoutLogs,
         { 
-          date: new Date(), 
+          date: getTrustedDate(), 
           logged: true, 
           audited: pendingAudit,
           auditPassed: pendingAudit ? true : undefined,
@@ -158,20 +198,40 @@ export default function Dashboard() {
   const handleConfirmMissed = () => {
     setShowMissedDialog(false);
     
-    const newRemaining = Math.max(0, challenge.remainingStake - PENALTY_AMOUNT);
+    applyPenalty(PENALTY_AMOUNT, 'Missed workout (self-reported)');
     
     setChallenge({
       ...challenge,
-      remainingStake: newRemaining,
+      remainingStake: Math.max(0, challenge.remainingStake - PENALTY_AMOUNT),
       totalPenalties: challenge.totalPenalties + PENALTY_AMOUNT,
       currentStreak: 0,
       workoutLogs: [
         ...challenge.workoutLogs,
-        { date: new Date(), logged: false, missed: true, audited: false },
+        { date: getTrustedDate(), logged: false, missed: true, audited: false },
       ],
     });
     
     toast.info("Penalty applied. Back tomorrow.");
+  };
+
+  const handleDayExpire = () => {
+    if (!todayProcessed && challengeStarted) {
+      // Auto-apply penalty when day expires
+      applyPenalty(PENALTY_AMOUNT, 'Missed workout (day expired)');
+      
+      setChallenge({
+        ...challenge,
+        remainingStake: Math.max(0, challenge.remainingStake - PENALTY_AMOUNT),
+        totalPenalties: challenge.totalPenalties + PENALTY_AMOUNT,
+        currentStreak: 0,
+        workoutLogs: [
+          ...challenge.workoutLogs,
+          { date: getTrustedDate(), logged: false, missed: true, audited: false },
+        ],
+      });
+      
+      toast.error("Day ended — ₹100 penalty applied");
+    }
   };
 
   const handleReset = () => {
@@ -265,7 +325,7 @@ export default function Dashboard() {
 
       <div className="min-h-[calc(100vh-56px)] flex flex-col p-6">
         {/* Header */}
-        <div className="flex justify-between items-start mb-8">
+        <div className="flex justify-between items-start mb-4">
           <div className="flex-1 min-w-0">
             <p className="text-sm text-muted-foreground uppercase">Remaining</p>
             <p className="text-4xl font-bold">₹{challenge.remainingStake.toLocaleString()}</p>
@@ -289,8 +349,28 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Countdown / Status Pill */}
+        {challengeStarted && (
+          <div className="flex justify-center mb-4">
+            {justLogged && todayLogged ? (
+              <LoggedSuccessPill />
+            ) : todayMissed ? (
+              <MissedDayPill />
+            ) : !todayProcessed ? (
+              <CountdownPill 
+                visible={!todayProcessed} 
+                onExpire={handleDayExpire}
+              />
+            ) : (
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-green-500 bg-green-500/10 text-green-500">
+                <span className="font-medium text-sm">Logged for today ✓</span>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Progress Ring */}
-        <div className="flex-1 flex items-center justify-center py-8">
+        <div className="flex-1 flex items-center justify-center py-6">
           <div className="relative">
             <ProgressRing progress={progress} size={280} strokeWidth={12}>
               <div className="text-center">
@@ -304,7 +384,7 @@ export default function Dashboard() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="border-2 p-4 text-center">
             <Flame className="w-6 h-6 mx-auto mb-2" />
             <p className="text-2xl font-bold">{challenge.currentStreak}</p>
@@ -349,7 +429,7 @@ export default function Dashboard() {
               variant="ghost"
               className="w-full h-12 text-sm font-medium uppercase border-2 border-muted-foreground/30 hover:border-muted-foreground hover:bg-transparent text-muted-foreground"
             >
-              Didn't work out
+              I didn't workout today
             </Button>
           )}
         </div>

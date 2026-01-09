@@ -191,6 +191,12 @@ All colors MUST be HSL.
   100% { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes splash-scale {
+  0% { transform: scale(0.95); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
 .animate-splash-lock-body {
   animation: splash-lock-body 1.2s ease-out forwards;
 }
@@ -207,18 +213,33 @@ All colors MUST be HSL.
   animation: splash-text 1.2s ease-out forwards;
 }
 
+.animate-splash-scale {
+  animation: splash-scale 1.2s ease-out forwards;
+}
+
 /* Page transitions */
 @keyframes page-enter {
-  0% { opacity: 0; transform: translateY(8px); }
+  0% { opacity: 0; transform: translateY(12px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
 .animate-page-enter {
-  animation: page-enter 0.2s ease-out;
+  animation: page-enter 0.3s ease-out;
 }
 
 /* Button tap feedback */
 button:not(:disabled):active,
 [role="button"]:not(:disabled):active {
+  transform: scale(0.98);
   transition: transform 0.1s ease-out;
+}
+
+/* Prevent text selection on all interactive elements */
+button,
+[role="button"],
+.select-none {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent !important;
 }

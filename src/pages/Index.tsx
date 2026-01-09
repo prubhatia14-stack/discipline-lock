@@ -2,28 +2,31 @@ import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useChallenge } from "@/context/ChallengeContext";
 import { SplashScreen } from "@/components/SplashScreen";
+import { useAppLaunchAnimation } from "@/hooks/useAppLaunchAnimation";
 
 export default function Index() {
   const navigate = useNavigate();
   const { challenge } = useChallenge();
-  const [showSplash, setShowSplash] = useState(true);
-
-  const handleSplashComplete = useCallback(() => {
-    setShowSplash(false);
-  }, []);
+  const { showFullSplash, showQuickSplash, splashComplete, completeSplash } = useAppLaunchAnimation();
 
   useEffect(() => {
-    if (!showSplash) {
+    if (splashComplete) {
       if (challenge && challenge.status === 'active') {
         navigate("/dashboard");
       } else {
         navigate("/onboarding");
       }
     }
-  }, [challenge, navigate, showSplash]);
+  }, [challenge, navigate, splashComplete]);
 
-  if (showSplash) {
-    return <SplashScreen onComplete={handleSplashComplete} duration={1500} />;
+  if (showFullSplash || showQuickSplash) {
+    return (
+      <SplashScreen 
+        onComplete={completeSplash} 
+        duration={1500}
+        isQuick={showQuickSplash}
+      />
+    );
   }
 
   return (

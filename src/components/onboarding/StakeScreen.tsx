@@ -34,10 +34,10 @@ export function StakeScreen({ initialStake, onContinue, onBack }: StakeScreenPro
   const isValid = selectedStake >= 500;
 
   return (
-    <div className="flex flex-col min-h-screen p-8">
+    <div className="flex flex-col min-h-screen p-8 select-none">
       <button 
         onClick={onBack}
-        className="self-start text-muted-foreground hover:text-foreground transition-colors uppercase text-sm font-medium"
+        className="self-start text-muted-foreground hover:text-foreground transition-colors uppercase text-sm font-medium select-none"
       >
         ← Back
       </button>

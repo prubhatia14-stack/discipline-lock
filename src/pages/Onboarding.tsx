@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useChallenge } from "@/context/ChallengeContext";
 import { IntroScreen } from "@/components/onboarding/IntroScreen";
@@ -7,6 +7,7 @@ import { DurationScreen } from "@/components/onboarding/DurationScreen";
 import { RulesScreen } from "@/components/onboarding/RulesScreen";
 import { StartDateScreen } from "@/components/onboarding/StartDateScreen";
 import { PaymentScreen } from "@/components/onboarding/PaymentScreen";
+import { PageTransition } from "@/components/PageTransition";
 import { addDays } from "date-fns";
 import { toast } from "sonner";
 
@@ -40,54 +41,66 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="dark min-h-screen bg-background text-foreground">
+    <div className="dark min-h-screen bg-background text-foreground overflow-hidden">
       {step === 1 && (
-        <IntroScreen onContinue={() => setStep(2)} />
+        <PageTransition key="intro">
+          <IntroScreen onContinue={() => setStep(2)} />
+        </PageTransition>
       )}
       {step === 2 && (
-        <StakeScreen
-          initialStake={stakeAmount}
-          onContinue={(stake) => {
-            setStakeAmount(stake);
-            setStep(3);
-          }}
-          onBack={() => setStep(1)}
-        />
+        <PageTransition key="stake">
+          <StakeScreen
+            initialStake={stakeAmount}
+            onContinue={(stake) => {
+              setStakeAmount(stake);
+              setStep(3);
+            }}
+            onBack={() => setStep(1)}
+          />
+        </PageTransition>
       )}
       {step === 3 && (
-        <DurationScreen
-          initialDuration={durationDays}
-          onContinue={(duration) => {
-            setDurationDays(duration);
-            setStep(4);
-          }}
-          onBack={() => setStep(2)}
-        />
+        <PageTransition key="duration">
+          <DurationScreen
+            initialDuration={durationDays}
+            onContinue={(duration) => {
+              setDurationDays(duration);
+              setStep(4);
+            }}
+            onBack={() => setStep(2)}
+          />
+        </PageTransition>
       )}
       {step === 4 && (
-        <RulesScreen
-          stakeAmount={stakeAmount}
-          onContinue={() => setStep(5)}
-          onBack={() => setStep(3)}
-        />
+        <PageTransition key="rules">
+          <RulesScreen
+            stakeAmount={stakeAmount}
+            onContinue={() => setStep(5)}
+            onBack={() => setStep(3)}
+          />
+        </PageTransition>
       )}
       {step === 5 && (
-        <StartDateScreen
-          onContinue={(date) => {
-            setStartDate(date);
-            setStep(6);
-          }}
-          onBack={() => setStep(4)}
-        />
+        <PageTransition key="startdate">
+          <StartDateScreen
+            onContinue={(date) => {
+              setStartDate(date);
+              setStep(6);
+            }}
+            onBack={() => setStep(4)}
+          />
+        </PageTransition>
       )}
       {step === 6 && (
-        <PaymentScreen
-          stakeAmount={stakeAmount}
-          durationDays={durationDays}
-          startDate={startDate}
-          onConfirm={handleConfirm}
-          onBack={() => setStep(5)}
-        />
+        <PageTransition key="payment">
+          <PaymentScreen
+            stakeAmount={stakeAmount}
+            durationDays={durationDays}
+            startDate={startDate}
+            onConfirm={handleConfirm}
+            onBack={() => setStep(5)}
+          />
+        </PageTransition>
       )}
     </div>
   );

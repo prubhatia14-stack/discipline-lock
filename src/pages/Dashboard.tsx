@@ -4,11 +4,13 @@ import { useChallenge } from "@/context/ChallengeContext";
 import { useTrustedTime } from "@/hooks/useTrustedTime";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { ProgressRing } from "@/components/ProgressRing";
+import { LayerFillProgress } from "@/components/LayerFillProgress";
 import { AuditFlow } from "@/components/AuditFlow";
 import { QuickLogSheet } from "@/components/QuickLogSheet";
 import { MissedWorkoutDialog } from "@/components/MissedWorkoutDialog";
 import { PyramidAnimation } from "@/components/PyramidAnimation";
-import { ConfettiCelebration } from "@/components/ConfettiCelebration";
+import { CanvasConfetti, triggerWorkoutSuccessAnimation } from "@/components/CanvasConfetti";
+import { LockedInStamp } from "@/components/LockedInStamp";
 import { CountdownPill, LoggedSuccessPill, MissedDayPill } from "@/components/CountdownPill";
 import { HoldButton } from "@/components/ui/HoldButton";
 import { Button } from "@/components/ui/button";
@@ -30,6 +32,7 @@ export default function Dashboard() {
   const [pendingAudit, setPendingAudit] = useState(false);
   const [showPyramid, setShowPyramid] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showStamp, setShowStamp] = useState(false);
   const [justLogged, setJustLogged] = useState(false);
   const [missedPenaltiesApplied, setMissedPenaltiesApplied] = useState(0);
 
@@ -174,13 +177,23 @@ export default function Dashboard() {
     });
   };
 
-  const handlePyramidComplete = () => {
+  const handlePyramidComplete = async () => {
     setShowPyramid(false);
+    
+    // Trigger confetti and stamp together
     setShowConfetti(true);
+    setShowStamp(true);
+    
+    // Also trigger programmatically for reliability
+    await triggerWorkoutSuccessAnimation();
+    
     toast.success("Workout logged!");
     
-    // Reset confetti after animation
-    setTimeout(() => setShowConfetti(false), 3000);
+    // Reset after animation
+    setTimeout(() => {
+      setShowConfetti(false);
+      setShowStamp(false);
+    }, 1500);
   };
 
   const handleQuickLogCancel = () => {
@@ -321,7 +334,8 @@ export default function Dashboard() {
         onComplete={handlePyramidComplete}
       />
       
-      <ConfettiCelebration trigger={showConfetti} />
+      <CanvasConfetti trigger={showConfetti} />
+      <LockedInStamp trigger={showStamp} />
 
       <div className="min-h-[calc(100vh-56px)] flex flex-col p-6">
         {/* Header */}

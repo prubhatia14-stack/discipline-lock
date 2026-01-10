@@ -13,7 +13,7 @@ const RULES = [
   "Log 1 workout per day",
   "Minimum workout time: 45 minutes",
   "Missed day penalty: ₹100",
-  "Complete all days to get your money back",
+  "Complete all days to get your stake back",
 ];
 
 export function RulesScreen({ stakeAmount, onContinue, onBack }: RulesScreenProps) {

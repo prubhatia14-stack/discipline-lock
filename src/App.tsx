@@ -14,6 +14,7 @@ import Share from "./pages/Share";
 import Settings from "./pages/Settings";
 import Wallet from "./pages/Wallet";
 import Challenges from "./pages/Challenges";
+import AuditRules from "./pages/AuditRules";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/settings" element={<Settings />} />
             <Route path="/wallet" element={<Wallet />} />
             <Route path="/challenges" element={<Challenges />} />
+            <Route path="/audit-rules" element={<AuditRules />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

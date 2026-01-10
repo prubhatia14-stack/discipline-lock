@@ -9,7 +9,7 @@ interface DurationScreenProps {
 }
 
 const DURATION_OPTIONS = [
-  { days: 14, label: "2 weeks", description: "Easy start" },
+  { days: 14, label: "14 days", description: "Easy start" },
   { days: 30, label: "30 days", description: "Standard" },
   { days: 60, label: "60 days", description: "Serious" },
   { days: 90, label: "90 days", description: "Maximum" },

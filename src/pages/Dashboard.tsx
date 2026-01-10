@@ -8,9 +8,7 @@ import { LayerFillProgress } from "@/components/LayerFillProgress";
 import { AuditFlow } from "@/components/AuditFlow";
 import { QuickLogSheet } from "@/components/QuickLogSheet";
 import { MissedWorkoutDialog } from "@/components/MissedWorkoutDialog";
-import { PyramidAnimation } from "@/components/PyramidAnimation";
-import { CanvasConfetti, triggerWorkoutSuccessAnimation } from "@/components/CanvasConfetti";
-import { LockedInStamp } from "@/components/LockedInStamp";
+import { CanvasConfetti } from "@/components/CanvasConfetti";
 import { CountdownPill, LoggedSuccessPill, MissedDayPill } from "@/components/CountdownPill";
 import { HoldButton } from "@/components/ui/HoldButton";
 import { Button } from "@/components/ui/button";
@@ -30,9 +28,7 @@ export default function Dashboard() {
   const [showQuickLog, setShowQuickLog] = useState(false);
   const [showMissedDialog, setShowMissedDialog] = useState(false);
   const [pendingAudit, setPendingAudit] = useState(false);
-  const [showPyramid, setShowPyramid] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [showStamp, setShowStamp] = useState(false);
   const [justLogged, setJustLogged] = useState(false);
   const [missedPenaltiesApplied, setMissedPenaltiesApplied] = useState(0);
 
@@ -153,10 +149,10 @@ export default function Dashboard() {
 
   const handleQuickLogComplete = (data: { type: WorkoutType; intensity: WorkoutIntensity; notes?: string }) => {
     setShowQuickLog(false);
-    
-    // Show pyramid animation
-    setShowPyramid(true);
     setJustLogged(true);
+    
+    // Trigger confetti
+    setShowConfetti(true);
     
     setChallenge({
       ...challenge,
@@ -175,24 +171,13 @@ export default function Dashboard() {
         },
       ],
     });
-  };
-
-  const handlePyramidComplete = async () => {
-    setShowPyramid(false);
     
-    // Trigger confetti and stamp together
-    setShowConfetti(true);
-    setShowStamp(true);
-    
-    // Also trigger programmatically for reliability
-    await triggerWorkoutSuccessAnimation();
-    
+    // Single toast notification
     toast.success("Workout logged!");
     
-    // Reset after animation
+    // Reset confetti after animation
     setTimeout(() => {
       setShowConfetti(false);
-      setShowStamp(false);
     }, 1500);
   };
 
@@ -329,13 +314,7 @@ export default function Dashboard() {
         onCancel={() => setShowMissedDialog(false)}
       />
 
-      <PyramidAnimation 
-        isVisible={showPyramid} 
-        onComplete={handlePyramidComplete}
-      />
-      
       <CanvasConfetti trigger={showConfetti} />
-      <LockedInStamp trigger={showStamp} />
 
       <div className="min-h-[calc(100vh-56px)] flex flex-col p-6">
         {/* Header */}

@@ -18,9 +18,8 @@ export default function Stakes() {
   const rules = [
     "Log 1 workout per day",
     "Minimum workout time: 45 minutes",
-    "20% random audits",
     `Missed day penalty: ₹${PENALTY_PER_DAY}`,
-    "Audit failure = challenge failed",
+    "Complete all days to get your stake back",
   ];
 
   return (

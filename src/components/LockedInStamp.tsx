@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface LockedInStampProps {
@@ -9,9 +9,11 @@ interface LockedInStampProps {
 export function LockedInStamp({ trigger, onComplete }: LockedInStampProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
+  const lastTriggerRef = useRef(false);
 
   useEffect(() => {
-    if (trigger && !isAnimating) {
+    // Only trigger on rising edge (false -> true transition)
+    if (trigger && !lastTriggerRef.current && !isAnimating) {
       setIsAnimating(true);
       setIsVisible(true);
 
@@ -26,11 +28,16 @@ export function LockedInStamp({ trigger, onComplete }: LockedInStampProps) {
         onComplete?.();
       }, 900);
 
+      lastTriggerRef.current = trigger;
+
       return () => {
         clearTimeout(fadeTimer);
         clearTimeout(completeTimer);
       };
     }
+    
+    // Track the trigger state
+    lastTriggerRef.current = trigger;
   }, [trigger, isAnimating, onComplete]);
 
   if (!isAnimating) return null;

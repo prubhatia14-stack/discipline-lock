@@ -9,6 +9,7 @@ import {
   Settings,
   Wallet,
   History,
+  Shield,
 } from "lucide-react";
 import {
   Sidebar,
@@ -27,6 +28,7 @@ const menuItems = [
   { title: "Wallet", url: "/wallet", icon: Wallet },
   { title: "Challenges", url: "/challenges", icon: History },
   { title: "Stakes & Rules", url: "/stakes", icon: Scale },
+  { title: "Audit Rules", url: "/audit-rules", icon: Shield },
   { title: "Profile", url: "/profile", icon: User },
   { title: "Share", url: "/share", icon: Share2 },
   { title: "Settings", url: "/settings", icon: Settings },

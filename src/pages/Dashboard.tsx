@@ -345,13 +345,13 @@ export default function Dashboard() {
         {/* Countdown / Status Pill */}
         {challengeStarted && (
           <div className="flex justify-center mb-4">
-            {todayMissed ? (
-              <MissedDayPill />
-            ) : justLogged || todayLogged ? (
+            {todayLogged ? (
               <LoggedSuccessPill />
+            ) : todayMissed ? (
+              <MissedDayPill />
             ) : (
               <CountdownPill 
-                visible={!todayProcessed} 
+                visible={true} 
                 onExpire={handleDayExpire}
               />
             )}

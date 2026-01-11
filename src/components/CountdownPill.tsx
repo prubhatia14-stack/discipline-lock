@@ -74,17 +74,8 @@ export function CountdownPill({ onExpire, visible }: CountdownPillProps) {
 }
 
 export function LoggedSuccessPill() {
-  const [visible, setVisible] = useState(true);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setVisible(false), 2000);
-    return () => clearTimeout(timeout);
-  }, []);
-
-  if (!visible) return null;
-
   return (
-    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-green-500 bg-green-500/10 text-green-500 animate-fade-in">
+    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-green-500 bg-green-500/10 text-green-500">
       <span className="font-medium text-sm">Logged for today ✓</span>
     </div>
   );

@@ -5,19 +5,22 @@ import { cn } from "@/lib/utils";
 
 interface RulesScreenProps {
   stakeAmount: number;
+  durationDays: number;
   onContinue: () => void;
   onBack: () => void;
 }
 
-const RULES = [
-  "Log 1 workout per day",
-  "Minimum workout time: 45 minutes",
-  "Missed day penalty: ₹100",
-  "Complete all days to get your stake back",
-];
+const PENALTY_PER_DAY = 100;
 
-export function RulesScreen({ stakeAmount, onContinue, onBack }: RulesScreenProps) {
+export function RulesScreen({ stakeAmount, durationDays, onContinue, onBack }: RulesScreenProps) {
   const [checkedRules, setCheckedRules] = useState<number[]>([]);
+
+  const RULES = [
+    "Log exactly 1 workout per day",
+    `Missed day penalty: ₹${PENALTY_PER_DAY} (fixed)`,
+    "Balance cannot go negative — max loss is your locked amount",
+    `Complete all ${durationDays} days to get ₹${stakeAmount.toLocaleString()} back`,
+  ];
 
   const toggleRule = (index: number) => {
     setCheckedRules((prev) =>
@@ -70,9 +73,11 @@ export function RulesScreen({ stakeAmount, onContinue, onBack }: RulesScreenProp
             ))}
           </div>
 
-          <div className="p-4 border-2 border-dashed">
+          <div className="p-4 border-2 border-dashed bg-muted/30">
             <p className="text-center text-sm text-muted-foreground">
-              Your stake: <span className="font-bold text-foreground">₹{stakeAmount.toLocaleString()}</span>
+              Your lock-in: <span className="font-bold text-foreground">₹{stakeAmount.toLocaleString()}</span>
+              <br />
+              <span className="text-xs">This is discipline, not gambling.</span>
             </p>
           </div>
 
@@ -81,7 +86,7 @@ export function RulesScreen({ stakeAmount, onContinue, onBack }: RulesScreenProp
             disabled={!allChecked}
             className="w-full h-14 text-lg font-bold uppercase border-2 shadow-md hover:shadow-xs hover:translate-x-[3px] hover:translate-y-[3px] transition-all disabled:opacity-50"
           >
-            I Agree
+            I Understand
           </Button>
         </div>
       </div>

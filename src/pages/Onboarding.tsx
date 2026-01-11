@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useChallenge } from "@/context/ChallengeContext";
 import { IntroScreen } from "@/components/onboarding/IntroScreen";
-import { StakeScreen } from "@/components/onboarding/StakeScreen";
 import { DurationScreen } from "@/components/onboarding/DurationScreen";
 import { RulesScreen } from "@/components/onboarding/RulesScreen";
 import { StartDateScreen } from "@/components/onboarding/StartDateScreen";
@@ -11,14 +10,18 @@ import { PageTransition } from "@/components/PageTransition";
 import { addDays } from "date-fns";
 import { toast } from "sonner";
 
+const PENALTY_PER_DAY = 100;
+
 export default function Onboarding() {
   const navigate = useNavigate();
   const { setChallenge } = useChallenge();
   
   const [step, setStep] = useState(1);
-  const [stakeAmount, setStakeAmount] = useState(1000);
   const [durationDays, setDurationDays] = useState(30);
   const [startDate, setStartDate] = useState<Date>(new Date());
+
+  // Auto-calculate stake: ₹100 per day
+  const stakeAmount = durationDays * PENALTY_PER_DAY;
 
   const handleConfirm = () => {
     const challenge = {
@@ -36,7 +39,7 @@ export default function Onboarding() {
     };
     
     setChallenge(challenge);
-    toast.success("Challenge started! Your money is now locked.");
+    toast.success("Challenge started! Your discipline is now locked in.");
     navigate("/dashboard");
   };
 
@@ -48,11 +51,11 @@ export default function Onboarding() {
         </PageTransition>
       )}
       {step === 2 && (
-        <PageTransition key="stake">
-          <StakeScreen
-            initialStake={stakeAmount}
-            onContinue={(stake) => {
-              setStakeAmount(stake);
+        <PageTransition key="duration">
+          <DurationScreen
+            initialDuration={durationDays}
+            onContinue={(duration) => {
+              setDurationDays(duration);
               setStep(3);
             }}
             onBack={() => setStep(1)}
@@ -60,45 +63,34 @@ export default function Onboarding() {
         </PageTransition>
       )}
       {step === 3 && (
-        <PageTransition key="duration">
-          <DurationScreen
-            initialDuration={durationDays}
-            onContinue={(duration) => {
-              setDurationDays(duration);
-              setStep(4);
-            }}
+        <PageTransition key="rules">
+          <RulesScreen
+            stakeAmount={stakeAmount}
+            durationDays={durationDays}
+            onContinue={() => setStep(4)}
             onBack={() => setStep(2)}
           />
         </PageTransition>
       )}
       {step === 4 && (
-        <PageTransition key="rules">
-          <RulesScreen
-            stakeAmount={stakeAmount}
-            onContinue={() => setStep(5)}
+        <PageTransition key="startdate">
+          <StartDateScreen
+            onContinue={(date) => {
+              setStartDate(date);
+              setStep(5);
+            }}
             onBack={() => setStep(3)}
           />
         </PageTransition>
       )}
       {step === 5 && (
-        <PageTransition key="startdate">
-          <StartDateScreen
-            onContinue={(date) => {
-              setStartDate(date);
-              setStep(6);
-            }}
-            onBack={() => setStep(4)}
-          />
-        </PageTransition>
-      )}
-      {step === 6 && (
         <PageTransition key="payment">
           <PaymentScreen
             stakeAmount={stakeAmount}
             durationDays={durationDays}
             startDate={startDate}
             onConfirm={handleConfirm}
-            onBack={() => setStep(5)}
+            onBack={() => setStep(4)}
           />
         </PageTransition>
       )}

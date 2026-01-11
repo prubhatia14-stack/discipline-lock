@@ -117,12 +117,20 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
   const applyPenalty = useCallback((amount: number, reason: string = 'Missed workout') => {
     if (!challenge) return;
 
-    const newRemaining = Math.max(0, challenge.remainingStake - amount);
+    // CRITICAL: Never allow negative balance - only deduct if there's remaining stake
+    if (challenge.remainingStake <= 0) {
+      console.log('Cannot apply penalty: balance already at zero');
+      return;
+    }
+
+    // Only deduct up to remaining balance (never go negative)
+    const actualPenalty = Math.min(amount, challenge.remainingStake);
+    const newRemaining = challenge.remainingStake - actualPenalty;
     
     setChallengeState({
       ...challenge,
       remainingStake: newRemaining,
-      totalPenalties: challenge.totalPenalties + amount,
+      totalPenalties: challenge.totalPenalties + actualPenalty,
       currentStreak: 0,
     });
 
@@ -131,7 +139,7 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
       challengeId: challenge.id,
       type: 'penalty',
       reason,
-      amount: -amount,
+      amount: -actualPenalty,
       currency: 'INR',
       status: 'applied',
     });
@@ -179,31 +187,34 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (!hasLog) {
-        // Apply penalty for missed day
-        penaltiesApplied++;
-        updatedChallenge = {
-          ...updatedChallenge,
-          remainingStake: Math.max(0, updatedChallenge.remainingStake - PENALTY_AMOUNT),
-          totalPenalties: updatedChallenge.totalPenalties + PENALTY_AMOUNT,
-          currentStreak: 0,
-        };
+        // CRITICAL: Only apply penalty if there's remaining stake (never go negative)
+        if (updatedChallenge.remainingStake > 0) {
+          const actualPenalty = Math.min(PENALTY_AMOUNT, updatedChallenge.remainingStake);
+          penaltiesApplied++;
+          updatedChallenge = {
+            ...updatedChallenge,
+            remainingStake: updatedChallenge.remainingStake - actualPenalty,
+            totalPenalties: updatedChallenge.totalPenalties + actualPenalty,
+            currentStreak: 0,
+          };
 
-        // Add missed log
+          // Create transaction
+          addTransaction({
+            challengeId: challenge.id,
+            type: 'penalty',
+            reason: `Missed workout (${dayKey})`,
+            amount: -actualPenalty,
+            currency: 'INR',
+            status: 'applied',
+          });
+        }
+
+        // Always add missed log (even if no penalty due to zero balance)
         newLogs.push({
           date: new Date(current),
           logged: false,
           missed: true,
           audited: false,
-        });
-
-        // Create transaction
-        addTransaction({
-          challengeId: challenge.id,
-          type: 'penalty',
-          reason: `Missed workout (${dayKey})`,
-          amount: -PENALTY_AMOUNT,
-          currency: 'INR',
-          status: 'applied',
         });
       }
 

@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useChallenge } from "@/context/ChallengeContext";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { format } from "date-fns";
-import { Check } from "lucide-react";
+import { Check, Shield } from "lucide-react";
 
 const PENALTY_PER_DAY = 100;
 
@@ -16,22 +16,29 @@ export default function Stakes() {
   }
 
   const rules = [
-    "Log 1 workout per day",
-    "Minimum workout time: 45 minutes",
-    `Missed day penalty: ₹${PENALTY_PER_DAY}`,
-    "Complete all days to get your stake back",
+    "Log exactly 1 workout per day",
+    `Missed day penalty: ₹${PENALTY_PER_DAY} (fixed)`,
+    "Balance cannot go negative — max loss is your locked amount",
+    `Complete all ${challenge.durationDays} days to get full stake back`,
   ];
 
   return (
     <DashboardLayout>
       <div className="p-6 max-w-lg mx-auto">
-        <h1 className="text-2xl font-bold uppercase mb-6">Stakes & Rules</h1>
+        <h1 className="text-2xl font-bold uppercase mb-6">Your Discipline Lock</h1>
+
+        {/* Philosophy */}
+        <div className="border-2 border-dashed p-4 mb-6 bg-muted/30">
+          <p className="text-sm text-muted-foreground text-center italic">
+            "I'm not gambling. I'm pre-paying my discipline."
+          </p>
+        </div>
 
         {/* Current Stake Info */}
         <div className="border-2 border-border p-4 mb-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-muted-foreground uppercase">Total Staked</p>
+              <p className="text-sm text-muted-foreground uppercase">Locked Amount</p>
               <p className="text-2xl font-bold">₹{challenge.stakeAmount.toLocaleString()}</p>
             </div>
             <div>
@@ -39,7 +46,7 @@ export default function Stakes() {
               <p className="text-2xl font-bold">₹{challenge.remainingStake.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground uppercase">Penalties</p>
+              <p className="text-sm text-muted-foreground uppercase">Burned</p>
               <p className="text-2xl font-bold text-destructive">
                 {challenge.totalPenalties > 0 ? `-₹${challenge.totalPenalties}` : '₹0'}
               </p>
@@ -48,6 +55,17 @@ export default function Stakes() {
               <p className="text-sm text-muted-foreground uppercase">Duration</p>
               <p className="text-2xl font-bold">{challenge.durationDays} days</p>
             </div>
+          </div>
+        </div>
+
+        {/* Zero-Risk Guarantee */}
+        <div className="border-2 border-border p-4 mb-6 flex items-start gap-3">
+          <Shield className="w-5 h-5 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-bold text-sm uppercase mb-1">Zero-Risk Guarantee</p>
+            <p className="text-sm text-muted-foreground">
+              You can only lose what you locked. Balance never goes negative. No surprise charges.
+            </p>
           </div>
         </div>
 
@@ -67,7 +85,7 @@ export default function Stakes() {
 
         {/* Rules */}
         <div className="border-2 border-border p-4">
-          <h2 className="font-bold uppercase mb-4">Rules</h2>
+          <h2 className="font-bold uppercase mb-4">The Rules</h2>
           <ul className="space-y-3">
             {rules.map((rule, i) => (
               <li key={i} className="flex items-start gap-3">

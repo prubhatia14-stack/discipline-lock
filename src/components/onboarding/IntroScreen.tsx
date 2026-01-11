@@ -16,13 +16,21 @@ export function IntroScreen({ onContinue }: IntroScreenProps) {
         <PageTransition delay={100}>
           <div className="space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight uppercase leading-tight">
-              Put money on your consistency
+              Pre-pay your discipline
             </h1>
             
             <div className="space-y-2 text-lg text-muted-foreground">
-              <p>Miss workouts. Lose money.</p>
-              <p>Stay consistent. Get it back.</p>
+              <p>Miss a workout. Lose money.</p>
+              <p>Stay consistent. Get it all back.</p>
             </div>
+          </div>
+        </PageTransition>
+
+        <PageTransition delay={200}>
+          <div className="p-4 border-2 border-dashed bg-muted/30">
+            <p className="text-sm text-muted-foreground italic">
+              "I'm not gambling. I'm pre-paying my discipline."
+            </p>
           </div>
         </PageTransition>
 
@@ -32,7 +40,7 @@ export function IntroScreen({ onContinue }: IntroScreenProps) {
               onClick={onContinue}
               className="w-full h-14 text-lg font-bold uppercase border-2 shadow-md active:shadow-xs active:translate-x-[3px] active:translate-y-[3px] transition-all select-none"
             >
-              Start
+              Start Challenge
             </Button>
           </div>
         </PageTransition>

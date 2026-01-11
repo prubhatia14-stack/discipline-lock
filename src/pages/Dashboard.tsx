@@ -196,12 +196,18 @@ export default function Dashboard() {
   const handleConfirmMissed = () => {
     setShowMissedDialog(false);
     
-    applyPenalty(PENALTY_AMOUNT, 'Missed workout (self-reported)');
+    // Only apply penalty if there's remaining stake (never go negative)
+    const canApplyPenalty = challenge.remainingStake > 0;
+    const actualPenalty = canApplyPenalty ? Math.min(PENALTY_AMOUNT, challenge.remainingStake) : 0;
+    
+    if (canApplyPenalty) {
+      applyPenalty(actualPenalty, 'Missed workout (self-reported)');
+    }
     
     setChallenge({
       ...challenge,
-      remainingStake: Math.max(0, challenge.remainingStake - PENALTY_AMOUNT),
-      totalPenalties: challenge.totalPenalties + PENALTY_AMOUNT,
+      remainingStake: challenge.remainingStake - actualPenalty,
+      totalPenalties: challenge.totalPenalties + actualPenalty,
       currentStreak: 0,
       workoutLogs: [
         ...challenge.workoutLogs,
@@ -209,18 +215,27 @@ export default function Dashboard() {
       ],
     });
     
-    toast.info("Penalty applied. Back tomorrow.");
+    if (canApplyPenalty) {
+      toast.info(`₹${actualPenalty} burned. Back tomorrow.`);
+    } else {
+      toast.info("Day marked as missed. Balance already at zero.");
+    }
   };
 
   const handleDayExpire = () => {
     if (!todayProcessed && challengeStarted) {
-      // Auto-apply penalty when day expires
-      applyPenalty(PENALTY_AMOUNT, 'Missed workout (day expired)');
+      // Only apply penalty if there's remaining stake (never go negative)
+      const canApplyPenalty = challenge.remainingStake > 0;
+      const actualPenalty = canApplyPenalty ? Math.min(PENALTY_AMOUNT, challenge.remainingStake) : 0;
+      
+      if (canApplyPenalty) {
+        applyPenalty(actualPenalty, 'Missed workout (day expired)');
+      }
       
       setChallenge({
         ...challenge,
-        remainingStake: Math.max(0, challenge.remainingStake - PENALTY_AMOUNT),
-        totalPenalties: challenge.totalPenalties + PENALTY_AMOUNT,
+        remainingStake: challenge.remainingStake - actualPenalty,
+        totalPenalties: challenge.totalPenalties + actualPenalty,
         currentStreak: 0,
         workoutLogs: [
           ...challenge.workoutLogs,
@@ -228,7 +243,11 @@ export default function Dashboard() {
         ],
       });
       
-      toast.error("Day ended — ₹100 penalty applied");
+      if (canApplyPenalty) {
+        toast.error(`Day ended — ₹${actualPenalty} burned`);
+      } else {
+        toast.error("Day ended — marked as missed");
+      }
     }
   };
 

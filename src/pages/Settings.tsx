@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useChallenge } from "@/context/ChallengeContext";
+import { useAuth } from "@/context/AuthContext";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,10 +15,12 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { LogOut } from "lucide-react";
 
 export default function Settings() {
   const navigate = useNavigate();
   const { challenge, setChallenge } = useChallenge();
+  const { user, signOut } = useAuth();
 
   if (!challenge) {
     navigate("/");
@@ -29,6 +32,12 @@ export default function Settings() {
     localStorage.removeItem('habits_profile');
     toast.success("Challenge reset");
     navigate("/");
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out");
+    navigate("/auth");
   };
 
   return (
@@ -50,6 +59,25 @@ export default function Settings() {
                 <span>Habits</span>
               </div>
             </div>
+          </div>
+
+          {/* Account */}
+          <div className="border-2 border-border p-4">
+            <h2 className="font-bold uppercase mb-3">Account</h2>
+            <div className="space-y-2 text-sm mb-4">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Email</span>
+                <span className="truncate max-w-[180px]">{user?.email || "—"}</span>
+              </div>
+            </div>
+            <Button
+              onClick={handleSignOut}
+              variant="outline"
+              className="w-full border-2 font-bold uppercase flex items-center justify-center gap-2"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign Out
+            </Button>
           </div>
 
           {/* Danger Zone */}

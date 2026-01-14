@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ChallengeProvider } from "@/context/ChallengeContext";
+import { AuthProvider } from "@/context/AuthContext";
 import Index from "./pages/Index";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
@@ -15,6 +16,7 @@ import Settings from "./pages/Settings";
 import Wallet from "./pages/Wallet";
 import Challenges from "./pages/Challenges";
 import AuditRules from "./pages/AuditRules";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,26 +24,29 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <ChallengeProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/logs" element={<Logs />} />
-            <Route path="/stakes" element={<Stakes />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/share" element={<Share />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/wallet" element={<Wallet />} />
-            <Route path="/challenges" element={<Challenges />} />
-            <Route path="/audit-rules" element={<AuditRules />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </ChallengeProvider>
+      <AuthProvider>
+        <ChallengeProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/logs" element={<Logs />} />
+              <Route path="/stakes" element={<Stakes />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/share" element={<Share />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/wallet" element={<Wallet />} />
+              <Route path="/challenges" element={<Challenges />} />
+              <Route path="/audit-rules" element={<AuditRules />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </ChallengeProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

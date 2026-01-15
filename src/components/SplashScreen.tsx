@@ -60,7 +60,7 @@ export function SplashScreen({ onComplete, duration = 1500, isQuick = false }: S
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[100] bg-background flex items-center justify-center dark select-none",
+        "fixed inset-0 z-[100] bg-background text-foreground flex items-center justify-center dark select-none",
         "transition-all",
         isQuick ? "duration-150" : "duration-300",
         isExiting ? "opacity-0 scale-[1.02]" : "opacity-100 scale-100"

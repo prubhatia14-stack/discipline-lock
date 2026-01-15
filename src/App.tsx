@@ -17,6 +17,7 @@ import Wallet from "./pages/Wallet";
 import Challenges from "./pages/Challenges";
 import AuditRules from "./pages/AuditRules";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,8 +33,8 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/logs" element={<Logs />} />
               <Route path="/stakes" element={<Stakes />} />
               <Route path="/profile" element={<Profile />} />

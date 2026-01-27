@@ -19,6 +19,7 @@ import AuditRules from "./pages/AuditRules";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
+import { RequireAuth } from "@/components/RequireAuth";
 
 const queryClient = new QueryClient();
 
@@ -32,18 +33,88 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <RequireAuth>
+                    <Dashboard />
+                  </RequireAuth>
+                }
+              />
               <Route path="/auth" element={<Auth />} />
               <Route path="/auth/callback" element={<AuthCallback />} />
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/logs" element={<Logs />} />
-              <Route path="/stakes" element={<Stakes />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/share" element={<Share />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/wallet" element={<Wallet />} />
-              <Route path="/challenges" element={<Challenges />} />
-              <Route path="/audit-rules" element={<AuditRules />} />
+              <Route
+                path="/onboarding"
+                element={
+                  <RequireAuth>
+                    <Onboarding />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/logs"
+                element={
+                  <RequireAuth>
+                    <Logs />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/stakes"
+                element={
+                  <RequireAuth>
+                    <Stakes />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <RequireAuth>
+                    <Profile />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/share"
+                element={
+                  <RequireAuth>
+                    <Share />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <RequireAuth>
+                    <Settings />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/wallet"
+                element={
+                  <RequireAuth>
+                    <Wallet />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/challenges"
+                element={
+                  <RequireAuth>
+                    <Challenges />
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/audit-rules"
+                element={
+                  <RequireAuth>
+                    <AuditRules />
+                  </RequireAuth>
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

@@ -43,10 +43,11 @@ export default function Dashboard() {
     }
   }, []);
 
-  if (!challenge) {
-    navigate("/");
-    return null;
-  }
+  useEffect(() => {
+    if (!challenge) navigate("/", { replace: true });
+  }, [challenge, navigate]);
+
+  if (!challenge) return null;
 
   const trustedToday = getTrustedDate();
   trustedToday.setHours(0, 0, 0, 0);

@@ -2,6 +2,23 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { Challenge, OnboardingState, Transaction, ChallengeHistory } from '@/types/challenge';
 import { getTrustedNowStandalone, getDayKeyStandalone } from '@/hooks/useTrustedTime';
 
+function safeJsonParse<T>(raw: string | null, fallback: T, storageKey?: string): T {
+  if (!raw) return fallback;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    // If a previous version stored invalid/corrupted JSON, never let it brick the app.
+    if (storageKey) {
+      try {
+        localStorage.removeItem(storageKey);
+      } catch {
+        // ignore
+      }
+    }
+    return fallback;
+  }
+}
+
 interface ChallengeContextType {
   challenge: Challenge | null;
   setChallenge: (challenge: Challenge | null) => void;
@@ -31,42 +48,45 @@ const PENALTY_AMOUNT = 100;
 
 export function ChallengeProvider({ children }: { children: React.ReactNode }) {
   const [challenge, setChallengeState] = useState<Challenge | null>(() => {
-    const saved = localStorage.getItem('habits_challenge');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return {
-        ...parsed,
-        startDate: new Date(parsed.startDate),
-        endDate: new Date(parsed.endDate),
-        workoutLogs: parsed.workoutLogs.map((log: any) => ({
-          ...log,
-          date: new Date(log.date),
-        })),
-      };
-    }
-    return null;
+    const key = 'habits_challenge';
+    const parsed = safeJsonParse<any>(localStorage.getItem(key), null, key);
+    if (!parsed) return null;
+
+    // Defensive: older schemas / partial writes shouldn’t break startup.
+    const workoutLogs = Array.isArray(parsed.workoutLogs) ? parsed.workoutLogs : [];
+
+    return {
+      ...parsed,
+      startDate: parsed.startDate ? new Date(parsed.startDate) : new Date(),
+      endDate: parsed.endDate ? new Date(parsed.endDate) : new Date(),
+      workoutLogs: workoutLogs.map((log: any) => ({
+        ...log,
+        date: log?.date ? new Date(log.date) : new Date(),
+      })),
+    } as Challenge;
   });
 
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    const saved = localStorage.getItem('habits_transactions');
-    return saved ? JSON.parse(saved) : [];
+    const key = 'habits_transactions';
+    return safeJsonParse<Transaction[]>(localStorage.getItem(key), [], key);
   });
 
   const [challengeHistory, setChallengeHistory] = useState<ChallengeHistory[]>(() => {
-    const saved = localStorage.getItem('habits_challenge_history');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.map((ch: any) => ({
+    const key = 'habits_challenge_history';
+    const parsed = safeJsonParse<any[]>(localStorage.getItem(key), [], key);
+
+    return parsed.map((ch: any) => {
+      const workoutLogs = Array.isArray(ch?.workoutLogs) ? ch.workoutLogs : [];
+      return {
         ...ch,
-        startDate: new Date(ch.startDate),
-        endDate: new Date(ch.endDate),
-        workoutLogs: ch.workoutLogs.map((log: any) => ({
+        startDate: ch?.startDate ? new Date(ch.startDate) : new Date(),
+        endDate: ch?.endDate ? new Date(ch.endDate) : new Date(),
+        workoutLogs: workoutLogs.map((log: any) => ({
           ...log,
-          date: new Date(log.date),
+          date: log?.date ? new Date(log.date) : new Date(),
         })),
-      }));
-    }
-    return [];
+      } as ChallengeHistory;
+    });
   });
 
   const [onboarding, setOnboarding] = useState<OnboardingState>(initialOnboarding);

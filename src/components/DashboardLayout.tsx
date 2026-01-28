@@ -17,7 +17,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <SidebarTrigger className="p-2 hover:bg-muted transition-colors">
               <Menu className="w-5 h-5" />
             </SidebarTrigger>
-            <span className="ml-4 font-bold uppercase text-lg">Habits</span>
+            <span className="ml-4 font-bold uppercase text-lg">Lock It</span>
           </header>
           <main className="flex-1 overflow-auto">
             {children}

@@ -44,7 +44,7 @@ const initialOnboarding: OnboardingState = {
 
 const ChallengeContext = createContext<ChallengeContextType | undefined>(undefined);
 
-const PENALTY_AMOUNT = 100;
+const DEFAULT_PENALTY_AMOUNT = 100;
 
 export function ChallengeProvider({ children }: { children: React.ReactNode }) {
   const [challenge, setChallengeState] = useState<Challenge | null>(() => {
@@ -209,7 +209,8 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
       if (!hasLog) {
         // CRITICAL: Only apply penalty if there's remaining stake (never go negative)
         if (updatedChallenge.remainingStake > 0) {
-          const actualPenalty = Math.min(PENALTY_AMOUNT, updatedChallenge.remainingStake);
+          const penaltyAmt = challenge.penaltyPerDay || DEFAULT_PENALTY_AMOUNT;
+          const actualPenalty = Math.min(penaltyAmt, updatedChallenge.remainingStake);
           penaltiesApplied++;
           updatedChallenge = {
             ...updatedChallenge,

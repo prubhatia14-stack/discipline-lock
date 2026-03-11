@@ -5,16 +5,18 @@ import { Lock, Shield } from "lucide-react";
 interface PaymentScreenProps {
   stakeAmount: number;
   durationDays: number;
+  penaltyPerDay: number;
+  commitmentDaysPerWeek: number;
   startDate: Date;
   onConfirm: () => void;
   onBack: () => void;
 }
 
-const PENALTY_PER_DAY = 100;
-
 export function PaymentScreen({ 
   stakeAmount, 
   durationDays, 
+  penaltyPerDay,
+  commitmentDaysPerWeek,
   startDate, 
   onConfirm, 
   onBack 
@@ -47,8 +49,12 @@ export function PaymentScreen({
               <span className="font-bold">{durationDays} days</span>
             </div>
             <div className="p-4 flex justify-between items-center">
+              <span className="text-muted-foreground">Workout commitment</span>
+              <span className="font-bold">{commitmentDaysPerWeek} days/week</span>
+            </div>
+            <div className="p-4 flex justify-between items-center">
               <span className="text-muted-foreground">Penalty per miss</span>
-              <span className="font-bold text-destructive">-₹{PENALTY_PER_DAY}</span>
+              <span className="font-bold text-destructive">-₹{penaltyPerDay}</span>
             </div>
             <div className="p-4 flex justify-between items-center">
               <span className="text-muted-foreground">Start Date</span>
@@ -75,7 +81,7 @@ export function PaymentScreen({
             <div className="flex items-center gap-3 text-sm">
               <Lock className="w-5 h-5 shrink-0" />
               <p className="text-muted-foreground">
-                Complete all {durationDays} days = full ₹{stakeAmount.toLocaleString()} back. Miss days = ₹{PENALTY_PER_DAY} per miss deducted.
+                Complete all {durationDays} days = full ₹{stakeAmount.toLocaleString()} back. Miss days = ₹{penaltyPerDay} per miss deducted.
               </p>
             </div>
           </div>

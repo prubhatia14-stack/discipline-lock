@@ -2,6 +2,8 @@ export interface Challenge {
   id: string;
   stakeAmount: number;
   durationDays: number;
+  penaltyPerDay: number;
+  commitmentDaysPerWeek: number;
   startDate: Date;
   endDate: Date;
   currentStreak: number;

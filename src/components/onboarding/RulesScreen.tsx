@@ -2,22 +2,28 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { SignaturePad } from "./SignaturePad";
 
 interface RulesScreenProps {
   stakeAmount: number;
   durationDays: number;
+  penaltyPerDay: number;
+  commitmentDaysPerWeek: number;
   onContinue: () => void;
   onBack: () => void;
 }
 
-const PENALTY_PER_DAY = 100;
-
-export function RulesScreen({ stakeAmount, durationDays, onContinue, onBack }: RulesScreenProps) {
+export function RulesScreen({ stakeAmount, durationDays, penaltyPerDay, commitmentDaysPerWeek, onContinue, onBack }: RulesScreenProps) {
   const [checkedRules, setCheckedRules] = useState<number[]>([]);
+  const [hasSigned, setHasSigned] = useState(false);
+
+  const today = new Date();
 
   const RULES = [
-    "Log exactly 1 workout per day",
-    `Missed day penalty: ₹${PENALTY_PER_DAY} (fixed)`,
+    `Your challenge starts from ${format(today, "MMM d, yyyy")}`,
+    `Log at least ${commitmentDaysPerWeek} workouts per week`,
+    `Missed day penalty: ₹${penaltyPerDay} (fixed)`,
     "Balance cannot go negative — max loss is your locked amount",
     `Complete all ${durationDays} days to get ₹${stakeAmount.toLocaleString()} back`,
   ];
@@ -31,6 +37,7 @@ export function RulesScreen({ stakeAmount, durationDays, onContinue, onBack }: R
   };
 
   const allChecked = checkedRules.length === RULES.length;
+  const canContinue = allChecked && hasSigned;
 
   return (
     <div className="flex flex-col min-h-screen p-8">
@@ -42,7 +49,7 @@ export function RulesScreen({ stakeAmount, durationDays, onContinue, onBack }: R
       </button>
 
       <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto w-full">
-        <div className="w-full space-y-8">
+        <div className="w-full space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-3xl font-bold uppercase">The Rules</h2>
             <p className="text-muted-foreground">Tap each rule to confirm you understand.</p>
@@ -81,12 +88,20 @@ export function RulesScreen({ stakeAmount, durationDays, onContinue, onBack }: R
             </p>
           </div>
 
+          {/* Signature Pad */}
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground uppercase text-center font-medium">
+              Your commitment signature
+            </p>
+            <SignaturePad onSignatureChange={setHasSigned} />
+          </div>
+
           <Button 
             onClick={onContinue}
-            disabled={!allChecked}
+            disabled={!canContinue}
             className="w-full h-14 text-lg font-bold uppercase border-2 shadow-md hover:shadow-xs hover:translate-x-[3px] hover:translate-y-[3px] transition-all disabled:opacity-50"
           >
-            I Understand
+            I Commit
           </Button>
         </div>
       </div>

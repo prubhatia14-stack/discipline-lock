@@ -6,14 +6,8 @@ interface SignaturePadProps {
 
 export function SignaturePad({ onSignatureChange }: SignaturePadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
+  const isDrawingRef = useRef(false);
   const [hasDrawn, setHasDrawn] = useState(false);
-
-  const getCtx = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-    return canvas.getContext("2d");
-  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -25,7 +19,9 @@ export function SignaturePad({ onSignatureChange }: SignaturePadProps) {
     const ctx = canvas.getContext("2d");
     if (ctx) {
       ctx.scale(dpr, dpr);
-      ctx.strokeStyle = "hsl(var(--foreground))";
+      // Resolve CSS variable to actual color for canvas
+      const computed = getComputedStyle(canvas);
+      ctx.strokeStyle = computed.color || "#ffffff";
       ctx.lineWidth = 2;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
@@ -35,7 +31,7 @@ export function SignaturePad({ onSignatureChange }: SignaturePadProps) {
   const getPos = (e: React.TouchEvent | React.MouseEvent) => {
     const canvas = canvasRef.current!;
     const rect = canvas.getBoundingClientRect();
-    if ("touches" in e) {
+    if ("touches" in e && e.touches.length > 0) {
       return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
     }
     return { x: (e as React.MouseEvent).clientX - rect.left, y: (e as React.MouseEvent).clientY - rect.top };
@@ -43,18 +39,22 @@ export function SignaturePad({ onSignatureChange }: SignaturePadProps) {
 
   const startDraw = (e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
-    const ctx = getCtx();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const { x, y } = getPos(e);
     ctx.beginPath();
     ctx.moveTo(x, y);
-    setIsDrawing(true);
+    isDrawingRef.current = true;
   };
 
   const draw = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isDrawing) return;
+    if (!isDrawingRef.current) return;
     e.preventDefault();
-    const ctx = getCtx();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const { x, y } = getPos(e);
     ctx.lineTo(x, y);
@@ -66,7 +66,7 @@ export function SignaturePad({ onSignatureChange }: SignaturePadProps) {
   };
 
   const endDraw = () => {
-    setIsDrawing(false);
+    isDrawingRef.current = false;
   };
 
   const clear = () => {
@@ -85,7 +85,8 @@ export function SignaturePad({ onSignatureChange }: SignaturePadProps) {
       <div className="border-2 bg-muted/20 relative">
         <canvas
           ref={canvasRef}
-          className="w-full h-28 touch-none cursor-crosshair"
+          className="w-full h-28 cursor-crosshair text-foreground"
+          style={{ touchAction: "none" }}
           onMouseDown={startDraw}
           onMouseMove={draw}
           onMouseUp={endDraw}

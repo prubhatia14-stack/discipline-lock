@@ -57,6 +57,8 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
 
     return {
       ...parsed,
+      penaltyPerDay: parsed.penaltyPerDay || 100,
+      commitmentDaysPerWeek: parsed.commitmentDaysPerWeek || 5,
       startDate: parsed.startDate ? new Date(parsed.startDate) : new Date(),
       endDate: parsed.endDate ? new Date(parsed.endDate) : new Date(),
       workoutLogs: workoutLogs.map((log: any) => ({

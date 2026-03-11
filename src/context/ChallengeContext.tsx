@@ -209,7 +209,8 @@ export function ChallengeProvider({ children }: { children: React.ReactNode }) {
       if (!hasLog) {
         // CRITICAL: Only apply penalty if there's remaining stake (never go negative)
         if (updatedChallenge.remainingStake > 0) {
-          const actualPenalty = Math.min(PENALTY_AMOUNT, updatedChallenge.remainingStake);
+          const penaltyAmt = challenge.penaltyPerDay || DEFAULT_PENALTY_AMOUNT;
+          const actualPenalty = Math.min(penaltyAmt, updatedChallenge.remainingStake);
           penaltiesApplied++;
           updatedChallenge = {
             ...updatedChallenge,

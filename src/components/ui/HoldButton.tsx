@@ -26,7 +26,7 @@ export function HoldButton({
 }: HoldButtonProps) {
   const [progress, setProgress] = useState(0);
   const [isHolding, setIsHolding] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(0);
   const lastMilestoneRef = useRef<number>(0);
 

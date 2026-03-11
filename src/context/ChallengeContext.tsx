@@ -44,7 +44,7 @@ const initialOnboarding: OnboardingState = {
 
 const ChallengeContext = createContext<ChallengeContextType | undefined>(undefined);
 
-const PENALTY_AMOUNT = 100;
+const DEFAULT_PENALTY_AMOUNT = 100;
 
 export function ChallengeProvider({ children }: { children: React.ReactNode }) {
   const [challenge, setChallengeState] = useState<Challenge | null>(() => {
